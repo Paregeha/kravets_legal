@@ -711,10 +711,36 @@ ul{list-style:none}
   .map-frame{height:260px}
 }
 
-@media (min-width:900px){
+/* ===== ПЛАНШЕТ (768+): звичайний лендінг, без таб-бару ===== */
+@media (min-width:768px){
   body{padding-bottom:0}
   .bottom-nav{display:none}
   .main-nav{display:flex}
+  .header-call{display:inline-flex}  /* CTA ще не влазить — лишаємо іконку дзвінка */
+  .hero-grid{grid-template-columns:1.12fr .88fr;align-items:center}
+}
+
+/* 768–899: хедер тісний — підтискаємо нав, і заголовок не має ламатись у вузькій колонці */
+@media (min-width:768px) and (max-width:899px){
+  .main-nav a{padding:10px 11px;font-size:14px}
+  .hero-title{font-size:clamp(42px,6.2vw,58px)}
+  .hero-lead{font-size:16px}
+  .visual-card{max-width:340px}
+  /* картка вужча — два теги в один ряд налазять один на одного */
+  .visual-tag{font-size:11px;padding:6px 10px}
+  .visual-tag-1{left:12px}
+  .visual-tag-2{right:12px}
+  .visual-badge{padding:8px 12px}
+  .visual-badge b{font-size:13px}
+  .visual-badge small{font-size:10.5px}
+  /* три показники мусять лишатись одним рядком у вузькій колонці */
+  .trust{gap:14px 18px}
+  .trust b{font-size:28px}
+  .trust span{font-size:11.5px}
+  .section-title{font-size:clamp(28px,4.4vw,38px)}
+}
+
+@media (min-width:900px){
   .header-cta{display:inline-flex}
   .header-call{display:none}
   .hero-grid{grid-template-columns:1.05fr .95fr}
@@ -736,7 +762,7 @@ ul{list-style:none}
    МОБІЛЬНИЙ APP-РЕЖИМ (<900px): без скролу сторінки,
    перемикання екранів лише нижнім баром
    ===================================================== */
-@media (max-width:899px){
+@media (max-width:767px){
   html,body{height:100%}
   /* щільніший хедер на мобільному — підпис бренду не зливається */
   .site-header{
@@ -763,10 +789,50 @@ ul{list-style:none}
   body.app main>section.is-screen-active{opacity:1;visibility:visible;pointer-events:auto;transform:none}
   body.app .hero{padding-top:22px}
   body.app .hero::before{display:none}
+  .hero-visual{order:-1}   /* фото завжди над текстом */
   body.app .section{scroll-margin-top:0}
   body.app .legal-note{display:block;margin-top:22px;text-align:center;color:var(--muted-2);font-size:12px;line-height:1.6}
   /* main тепер прозорий (щоб просвічував mesh) — футер під ним інакше видно наскрізь */
   body.app .site-footer{display:none}
+}
+
+/* 521–767: афіша тут дала б крупний план (портрет 4:5 розтягується cover
+   у широку смугу й зумиться), тож повертаємо звичайну картку по центру */
+@media (min-width:521px) and (max-width:767px){
+  .visual-card{max-width:360px}
+}
+
+/* ===== HERO на телефоні: фото-афіша на всю ширину, що тане у фон ===== */
+@media (max-width:520px){
+  body.app .hero{padding-top:0}
+  .hero-grid{gap:0}
+  .hero-visual{
+    display:block;
+    margin:0 -22px -14px;           /* виходимо за padding контейнера */
+  }
+  .visual-card,.visual-card.has-photo{
+    max-width:none;width:100%;height:min(48vh,400px);aspect-ratio:auto;
+    border-radius:0;box-shadow:none;animation:none;
+    background:none;                /* фото переїжджає у ::before, щоб маска не з'їла бейджі */
+    overflow:visible;
+  }
+  .visual-card::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:var(--img-portrait) center 15%/cover no-repeat;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.72) 68%,rgba(0,0,0,.26) 87%,transparent 100%);
+            mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.72) 68%,rgba(0,0,0,.26) 87%,transparent 100%);
+  }
+  .visual-card::after{display:none}   /* внутрішня рамка тут зайва */
+  .visual-overlay{display:none}       /* темний градієнт заважає затуханню */
+
+  /* соцдоказ піднімаємо нагору — унизу він потрапив би в зону затухання */
+  .visual-badge{top:14px;left:14px;bottom:auto;padding:8px 12px;border-radius:12px}
+  .visual-badge b{font-size:13px}
+  .visual-badge small{font-size:10.5px}
+  .visual-tag-1{display:none}         /* поруч із бейджем не лишається місця */
+  .visual-tag-2{top:14px;right:14px}
+
+  body.app .hero-content{padding-top:4px}
 }
 
 /* =====================================================

@@ -43,7 +43,7 @@
   var spySections = ['practice', 'cases', 'advantages', 'reviews', 'contacts']
     .map(function (id) { return document.getElementById(id); }).filter(Boolean);
   var headerH = 66;
-  var appMQ = window.matchMedia('(max-width: 899px)');
+  var appMQ = window.matchMedia('(max-width: 767px)'); /* app-режим лише телефони; планшет = звичайний лендінг */
   var appMode = false;
   var current = 'hero';
 
