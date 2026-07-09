@@ -234,6 +234,7 @@ ul{list-style:none}
   transition:border-color .2s,color .2s,transform .15s,background .2s,box-shadow .2s;
 }
 .chip-btn svg{width:17px;height:17px;color:var(--accent)}
+.chip-cta{display:none}   /* чіп «Консультація» лише на мобільному */
 .chip-btn:hover{
   border-color:rgba(30,90,71,.4);color:var(--accent);transform:translateY(-1px);
   background:var(--glass-hover);box-shadow:var(--shadow-glass-lg),var(--glass-hi);
@@ -308,6 +309,7 @@ ul{list-style:none}
 }
 .hero-role{color:var(--accent);font-weight:600;font-size:clamp(14px,2.4vw,17px);margin-bottom:18px}
 .hero-lead{color:var(--muted);font-size:clamp(15px,2.2vw,18px);max-width:560px;margin-bottom:28px}
+.hero-lead-m{display:none}   /* короткий опис лише на мобільному */
 .hero-cta{margin-bottom:18px}
 .quick-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
 .trust{display:flex;flex-wrap:wrap;gap:20px 30px;padding-top:26px;border-top:1px solid var(--line)}
@@ -787,52 +789,78 @@ ul{list-style:none}
   }
   body.app main>section::-webkit-scrollbar{display:none}
   body.app main>section.is-screen-active{opacity:1;visibility:visible;pointer-events:auto;transform:none}
-  body.app .hero{padding-top:22px}
+  /* ── HERO: портрет на весь екран, текст поверх, без скролу ── */
+  body.app .hero{padding:0;overflow:hidden}
   body.app .hero::before{display:none}
-  .hero-visual{order:-1}   /* фото завжди над текстом */
+  .hero-grid{position:relative;display:block;height:100%;padding:0;margin:0;max-width:none;gap:0}
+
+  /* фото — фон усього героя */
+  .hero-visual{position:absolute;inset:0;margin:0;z-index:0;display:block}
+  .visual-card,.visual-card.has-photo{
+    position:absolute;inset:0;width:100%;height:100%;max-width:none;
+    aspect-ratio:auto;border-radius:0;box-shadow:none;animation:none;overflow:hidden;
+    background:var(--img-portrait) center 16%/cover no-repeat;
+  }
+  .visual-card::after{display:none}
+  /* скрим: обережно вгорі (обличчя), щільно внизу (текст читається) */
+  .visual-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,
+      rgba(12,22,18,.30) 0%,
+      rgba(12,22,18,.05) 24%,
+      rgba(12,22,18,.14) 42%,
+      rgba(12,22,18,.52) 60%,
+      rgba(12,22,18,.80) 78%,
+      rgba(12,22,18,.94) 100%);
+  }
+  /* плаваючі бейджі ховаємо — соцдоказ тепер угорі окремою смугою */
+  .visual-badge,.visual-tag{display:none}
+
+  /* соцдоказ (стаж) — угорі окремою скляною смугою над фото */
+  .trust{
+    position:absolute;top:14px;left:22px;right:22px;z-index:3;margin:0;
+    display:flex;gap:8px;padding:9px 12px;border:1px solid rgba(255,255,255,.2);
+    border-radius:14px;background:rgba(12,22,18,.34);
+    backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
+  }
+  .trust li{flex:1;align-items:center;text-align:center;gap:0}
+  .trust b{color:#fff;font-size:18px}
+  .trust span{color:rgba(255,255,255,.82);font-size:10px;margin-top:1px;letter-spacing:.01em}
+
+  /* контент поверх фото, притиснутий донизу */
+  .hero-content{
+    position:relative;z-index:2;height:100%;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:20px 22px calc(var(--nav-h) + var(--nav-gap)*2 + 16px + env(safe-area-inset-bottom));
+    color:#fff;
+  }
+  .hero-content .eyebrow{display:none}
+  .hero-title{color:#fff;font-size:clamp(42px,12.5vw,60px);margin:0 0 8px;text-shadow:0 2px 24px rgba(0,0,0,.4)}
+  .hero-title .accent{color:#fff}
+  .hero-role{color:rgba(255,255,255,.95);font-size:15px;font-weight:600;margin-bottom:10px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+  .hero-lead{display:none}
+  .hero-lead-m{
+    display:block;color:rgba(255,255,255,.86);font-size:13.5px;line-height:1.5;
+    margin:0 0 18px;max-width:38ch;text-shadow:0 1px 12px rgba(0,0,0,.45);
+  }
+  .hero-cta{display:none}          /* головна дія переїхала в рядок кнопок */
+
+  /* рядок із 3 кнопок: Консультація · Подзвонити · Додати контакт */
+  .quick-actions{display:flex;gap:8px;margin:0}
+  .quick-actions .chip-btn{
+    flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;
+    height:auto;min-height:62px;padding:11px 4px;
+    font-size:11.5px;line-height:1.15;text-align:center;border-radius:15px;
+    color:#fff;background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.3);
+    backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
+  }
+  .quick-actions .chip-btn svg{width:22px;height:22px;color:#fff}
+  .quick-actions .chip-cta{background:var(--accent);border-color:var(--accent);box-shadow:0 8px 22px rgba(30,90,71,.4)}
+  .quick-actions .chip-tg{display:none}
   body.app .section{scroll-margin-top:0}
   body.app .legal-note{display:block;margin-top:22px;text-align:center;color:var(--muted-2);font-size:12px;line-height:1.6}
   /* main тепер прозорий (щоб просвічував mesh) — футер під ним інакше видно наскрізь */
   body.app .site-footer{display:none}
-}
-
-/* 521–767: афіша тут дала б крупний план (портрет 4:5 розтягується cover
-   у широку смугу й зумиться), тож повертаємо звичайну картку по центру */
-@media (min-width:521px) and (max-width:767px){
-  .visual-card{max-width:360px}
-}
-
-/* ===== HERO на телефоні: фото-афіша на всю ширину, що тане у фон ===== */
-@media (max-width:520px){
-  body.app .hero{padding-top:0}
-  .hero-grid{gap:0}
-  .hero-visual{
-    display:block;
-    margin:0 -22px -14px;           /* виходимо за padding контейнера */
-  }
-  .visual-card,.visual-card.has-photo{
-    max-width:none;width:100%;height:min(48vh,400px);aspect-ratio:auto;
-    border-radius:0;box-shadow:none;animation:none;
-    background:none;                /* фото переїжджає у ::before, щоб маска не з'їла бейджі */
-    overflow:visible;
-  }
-  .visual-card::before{
-    content:"";position:absolute;inset:0;z-index:0;
-    background:var(--img-portrait) center 15%/cover no-repeat;
-    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.72) 68%,rgba(0,0,0,.26) 87%,transparent 100%);
-            mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.72) 68%,rgba(0,0,0,.26) 87%,transparent 100%);
-  }
-  .visual-card::after{display:none}   /* внутрішня рамка тут зайва */
-  .visual-overlay{display:none}       /* темний градієнт заважає затуханню */
-
-  /* соцдоказ піднімаємо нагору — унизу він потрапив би в зону затухання */
-  .visual-badge{top:14px;left:14px;bottom:auto;padding:8px 12px;border-radius:12px}
-  .visual-badge b{font-size:13px}
-  .visual-badge small{font-size:10.5px}
-  .visual-tag-1{display:none}         /* поруч із бейджем не лишається місця */
-  .visual-tag-2{top:14px;right:14px}
-
-  body.app .hero-content{padding-top:4px}
 }
 
 /* =====================================================
