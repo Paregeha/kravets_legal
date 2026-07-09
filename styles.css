@@ -855,7 +855,13 @@ ul{list-style:none}
     backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
   }
   .quick-actions .chip-btn svg{width:22px;height:22px;color:#fff}
-  .quick-actions .chip-cta{background:var(--accent);border-color:var(--accent);box-shadow:0 8px 22px rgba(30,90,71,.4)}
+  /* головна дія — матово-біла, у тому ж скляному стилі, але виразніша */
+  .quick-actions .chip-cta{
+    background:rgba(255,255,255,.94);border-color:rgba(255,255,255,.9);
+    color:var(--accent-deep);font-weight:700;
+    box-shadow:0 10px 26px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .quick-actions .chip-cta svg{color:var(--accent-deep)}
   .quick-actions .chip-tg{display:none}
   body.app .section{scroll-margin-top:0}
   body.app .legal-note{display:block;margin-top:22px;text-align:center;color:var(--muted-2);font-size:12px;line-height:1.6}
