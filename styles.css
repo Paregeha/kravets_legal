@@ -578,9 +578,16 @@ ul{list-style:none}
   position:relative;border-radius:var(--r);overflow:hidden;
   border:1px solid var(--glass-border);box-shadow:var(--shadow-glass);background:#dfe4dd;
 }
-.map-frame{display:block;width:100%;height:230px;border:0;filter:saturate(.92)}
+.map-frame{display:block;width:100%;height:230px;border:0;filter:saturate(.92);pointer-events:none}
+/* прозорий шар поверх iframe: інакше тап забирає собі вбудована мапа */
+.map-cover{
+  position:absolute;inset:0;z-index:2;display:block;width:100%;
+  background:transparent;transition:background .2s;
+}
+.map-cover:hover{background:rgba(18,33,27,.08)}
 .map-link{
-  position:absolute;right:12px;top:12px;z-index:2;
+  position:absolute;right:12px;top:12px;
+  display:inline-flex;align-items:center;gap:7px;
   padding:8px 13px;border-radius:var(--r-pill);font-size:12.5px;font-weight:700;color:var(--accent-deep);
   background:rgba(255,255,255,.6);
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
@@ -588,7 +595,8 @@ ul{list-style:none}
   box-shadow:0 6px 18px rgba(18,33,27,.16),var(--glass-hi);
   transition:background .2s,color .2s;
 }
-.map-link:hover{background:rgba(255,255,255,.85);color:var(--accent-2)}
+.map-link svg{width:15px;height:15px;color:var(--accent)}
+.map-cover:hover .map-link{background:rgba(255,255,255,.9);color:var(--accent-2)}
 .map-note{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13.5px;color:var(--muted)}
 .map-note svg{width:17px;height:17px;color:var(--accent);flex:0 0 auto}
 

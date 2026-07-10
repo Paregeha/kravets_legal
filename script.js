@@ -168,6 +168,30 @@
     });
   }
 
+  /* ---------- мапа: маршрут до офісу в рідному застосунку ----------
+     Початкову точку не вказуємо — застосунок сам підставляє поточне
+     місцеположення, тож дозвіл на геолокацію в браузері не потрібен. */
+  var mapEmbed = document.getElementById('mapEmbed');
+  var mapOpen = document.getElementById('mapOpen');
+  if (mapEmbed && mapOpen) {
+    var dest = mapEmbed.getAttribute('data-lat') + ',' + mapEmbed.getAttribute('data-lng');
+    var ua = navigator.userAgent;
+    // iPadOS 13+ прикидається Mac — відрізняємо за наявністю тачскріна
+    var isIOS = /iPad|iPhone|iPod/i.test(ua) ||
+                (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    // без saddr Apple Maps бере поточне місце; dirflg=d — маршрут авто
+    var appleDir = 'https://maps.apple.com/?daddr=' + dest + '&dirflg=d';
+    // app link: Android і iOS віддають його застосунку Google Maps, десктоп — вебу
+    var googleDir = 'https://www.google.com/maps/dir/?api=1&destination=' + dest +
+                    '&travelmode=driving';
+
+    mapOpen.addEventListener('click', function () {
+      if (isIOS) window.location.href = appleDir;
+      else if (/Android/i.test(ua)) window.location.href = googleDir;
+      else window.open(googleDir, '_blank', 'noopener');
+    });
+  }
+
   /* ---------- reveal-анімації при скролі ---------- */
   var revealTargets = document.querySelectorAll(
     '.section-head, .card, .tl-item, .portrait-card, .about-body, .contacts-form'
