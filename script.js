@@ -38,10 +38,9 @@
 
   /* ---------- навігація: десктоп-скрол ↔ мобільний app-режим ---------- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
-  var screenIds = ['hero', 'practice', 'cases', 'advantages', 'reviews', 'contacts'];
+  var screenIds = ['hero', 'practice', 'about', 'reviews', 'contacts'];
   var screenEls = screenIds.map(function (id) { return document.getElementById(id); }).filter(Boolean);
-  var spySections = ['practice', 'cases', 'advantages', 'reviews', 'contacts']
-    .map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  var spySections = screenEls;
   var headerH = 66;
   var appMQ = window.matchMedia('(max-width: 767px)'); /* app-режим лише телефони; планшет = звичайний лендінг */
   var appMode = false;
@@ -69,7 +68,7 @@
   function spy() {
     if (appMode || !spySections.length) return;
     var y = window.scrollY + headerH + 24;
-    var id = '';
+    var id = spySections[0].id;
     for (var i = 0; i < spySections.length; i++) {
       if (spySections[i].offsetTop <= y) id = spySections[i].id;
     }
@@ -119,9 +118,59 @@
   if (appMQ.addEventListener) appMQ.addEventListener('change', applyMode);
   else if (appMQ.addListener) appMQ.addListener(applyMode);
 
+  /* ---------- розкриття карток: відкрита завжди рівно одна ---------- */
+  document.addEventListener('click', function (e) {
+    var head = e.target.closest ? e.target.closest('.exp-head') : null;
+    if (!head) return;
+    var item = head.parentElement;
+    var willOpen = !item.classList.contains('is-open');
+
+    document.querySelectorAll('.is-open').forEach(function (el) {
+      el.classList.remove('is-open');
+      var h = el.querySelector('.exp-head');
+      if (h) h.setAttribute('aria-expanded', 'false');
+    });
+
+    if (willOpen) {
+      item.classList.add('is-open');
+      head.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  /* ---------- «Подзвонити» → меню вибору застосунку ---------- */
+  var callBtn = document.getElementById('callBtn');
+  var callMenu = document.getElementById('callMenu');
+  if (callBtn && callMenu) {
+    var closeCall = function () {
+      callMenu.hidden = true;
+      callBtn.setAttribute('aria-expanded', 'false');
+    };
+    var openCall = function () {
+      callMenu.hidden = false;
+      callBtn.setAttribute('aria-expanded', 'true');
+    };
+
+    callBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (callMenu.hidden) openCall(); else closeCall();
+    });
+
+    // пункт обрано → системний застосунок відкриється сам, меню ховаємо
+    callMenu.addEventListener('click', function (e) {
+      if (e.target.closest('.call-item')) closeCall();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!callMenu.hidden && !e.target.closest('#callDd')) closeCall();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !callMenu.hidden) { closeCall(); callBtn.focus(); }
+    });
+  }
+
   /* ---------- reveal-анімації при скролі ---------- */
   var revealTargets = document.querySelectorAll(
-    '.section-head, .card, .tl-item, .why-item, .about-portrait, .about-body, .map-card, .contacts-form'
+    '.section-head, .card, .tl-item, .portrait-card, .about-body, .contacts-form'
   );
   revealTargets.forEach(function (el) { el.classList.add('reveal'); });
 
@@ -146,7 +195,7 @@
     revealTargets.forEach(function (el) { io.observe(el); });
   }
 
-  /* ---------- vCard: «Додати контакт» ---------- */
+  /* ---------- vCard: «Додати в контакти» ---------- */
   var addBtn = document.getElementById('addContact');
   if (addBtn) {
     addBtn.addEventListener('click', function () {
@@ -173,10 +222,12 @@
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
 
-      // короткий візуальний відгук
-      var original = addBtn.innerHTML;
-      addBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg> Контакт збережено';
-      setTimeout(function () { addBtn.innerHTML = original; }, 1800);
+      // короткий візуальний відгук (міняємо лише підпис, іконку не чіпаємо)
+      var label = addBtn.querySelector('span');
+      if (!label) return;
+      var original = label.innerHTML;
+      label.textContent = 'Збережено';
+      setTimeout(function () { label.innerHTML = original; }, 1800);
     });
   }
 
@@ -240,38 +291,10 @@
     window.addEventListener('scroll', updateTl, { passive: true });
     window.addEventListener('resize', updateTl, { passive: true });
     // у мобільному app-режимі секція скролиться всередині себе
-    var casesSec = document.getElementById('cases');
-    if (casesSec) casesSec.addEventListener('scroll', updateTl, { passive: true });
+    var practiceSec = document.getElementById('practice');
+    if (practiceSec) practiceSec.addEventListener('scroll', updateTl, { passive: true });
     updateTl();
   }
-
-  /* ---------- count-up для цифр довіри ---------- */
-  (function () {
-    var nums = Array.prototype.slice.call(document.querySelectorAll('[data-count]'));
-    if (!nums.length) return;
-    if (prefersReduced) { return; } // лишаємо фінальні значення з розмітки
-    var run = function (el) {
-      var target = parseFloat(el.getAttribute('data-count')) || 0;
-      var suffix = el.getAttribute('data-suffix') || '';
-      var dur = 1100, t0 = null;
-      var frame = function (ts) {
-        if (t0 === null) t0 = ts;
-        var p = Math.min((ts - t0) / dur, 1);
-        var eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.round(eased * target) + suffix;
-        if (p < 1) requestAnimationFrame(frame); else el.textContent = target + suffix;
-      };
-      requestAnimationFrame(frame);
-    };
-    if ('IntersectionObserver' in window) {
-      var io2 = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting) { run(e.target); io2.unobserve(e.target); } });
-      }, { threshold: 0.5 });
-      nums.forEach(function (el) { io2.observe(el); });
-    } else {
-      nums.forEach(run);
-    }
-  })();
 
   /* ---------- відгуки: fade-слайдер (без горизонтального скролу) ---------- */
   var slider = document.getElementById('revSlider');
